@@ -13,7 +13,8 @@ class SessionsController < ApplicationController
 			log_in user
 			# remember 是在 helpers/sessions_helper 中的方法
 			params[:session][:remember_me] == '1' ? remember(user) : forget(user)
-			redirect_to user
+			# 换回之前保存的地方或者默认user
+			redirect_back_or user
 		else
 			# flash 是一个特定的类， now变量中只渲染一次
 			flash.now[:danger] = 'Invalid email/password combination'

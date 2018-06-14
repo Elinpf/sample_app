@@ -14,7 +14,9 @@ class User < ApplicationRecord
 	# 启用安全的password认证， Gemfile中添加了 'bcrypt'
 	has_secure_password
 	# password 要求
-	validates :password, presence: true, length: { minimum: 6 }
+	# 允许为空是因为 has_secure_password 会捕获空密码
+	# 当是新注册的时候空密码会失败，而PATCH更新的时候会绕过密码修改
+	validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
 
 	# 没有特殊要求的字段是可以不用单独添加的
 

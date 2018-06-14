@@ -15,6 +15,7 @@ class ActiveSupport::TestCase
 		!session[:user_id].nil?
 	end
 
+	# 模拟登录, 只需要session[:user_id] 中有 user.id 就可以了
 	def log_in_as(user)
 		session[:user_id] = user.id
 	end

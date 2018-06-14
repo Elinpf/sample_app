@@ -42,6 +42,11 @@ module SessionsHelper
 		end
 	end
 
+	# 返回Bool
+	def current_user?(user)
+		user == current_user
+	end
+
 	def logged_in?
 		!current_user.nil?
 	end
@@ -54,5 +59,17 @@ module SessionsHelper
 		# 删除session
 		session.delete(:user_id)
 		@current_user = nil
+	end
+
+	# 跳转到储存的地址中
+	def redirect_back_or(default)
+		redirect_to(session[:forwarding_url] || default)
+		session.delete(:fowrarding_url)
+	end
+
+	# 储存request中的地址
+	def store_location
+		# 只有当是GET的时候才能使用 request.original_rul
+		session[:forwarding_url] = request.original_url if request.get?
 	end
 end

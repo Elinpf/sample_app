@@ -12,6 +12,11 @@ gem 'rails', '~> 5.1.6'
 gem 'bcrypt'
 # bootstrap CSS
 gem 'bootstrap-sass'
+# 添加虚假User
+gem 'faker'
+# 分页
+gem 'will_paginate'
+gem 'bootstrap-will_paginate'
 # fquery
 gem 'jquery-rails'
 # Use sqlite3 as the database for Active Record
