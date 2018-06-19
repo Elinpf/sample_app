@@ -34,6 +34,9 @@ Rails.application.configure do
   # ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
 
+	# NOTE 在这里加入 action_mail.default_url_options
+	config.action_mailer.default_url_options = { host: 'localhost:3000' }
+
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
 

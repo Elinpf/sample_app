@@ -1,6 +1,11 @@
 require 'test_helper'
 
 class UsersSignupTest < ActionDispatch::IntegrationTest
+
+	def setup
+		# 清空所有邮箱信息
+		ActionMailer::Base.deliveries.clear
+	end
 	
 	test "invalid signup information" do
 		get signup_path
@@ -14,21 +19,35 @@ class UsersSignupTest < ActionDispatch::IntegrationTest
 		end
 		# 确认返回页面
 		assert_template 'users/new'
+		assert_select 'div#error_explanation'
+		assert_select 'div.field_with_errors'
 	end
 
-	test "valid signup information" do
+	test 'vaild signup information with account activation' do
 		get signup_path
-
-		# 确认块运行后User.count的不同，并且只有1的不同
-		assert_difference 'User.count', 1 do 
+		assert_difference 'User.count', 1 do
 			post users_path, params: { user: { name: "Example User",
 						email: "user@example.com",
-						password: "password", password_confirmation: "password" }}
+						password: "password", password_confirmation: "password" } }
 		end
-		# 跟踪页面中的重定向
+		assert_equal 1, ActionMailer::Base.deliveries.size
+		user = assigns(:user)
+		assert_not user.activated?
+		# 向尝试登录
+		log_in_as(user)
+		assert_not is_logged_in?
+		# 无效的activation token
+		get edit_account_activation_path("invalid token", email: user.email)
+		assert_not is_logged_in?
+		# 有效的token, 错误的email
+		get edit_account_activation_path(user.activation_token, email: "worng")
+		assert_not is_logged_in?
+		# 有效的token
+		get edit_account_activation_path(user.activation_token,
+				 email: user.email)
+		assert user.reload.activated?
 		follow_redirect!
-		# 确认重定向后的返回页面
-		assert_template "users/show"
+		assert_template 'users/show'
+		assert is_logged_in?
 	end
-
 end

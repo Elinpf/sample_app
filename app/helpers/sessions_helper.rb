@@ -35,7 +35,7 @@ module SessionsHelper
 		# 当是记住的token时使用cookies
 		elsif (user_id = cookies.signed[:user_id])
 			user = User.find_by(id: user_id)
-			if user and user.authenticated?(cookies[:remember_token])
+			if user and user.authenticated?(:remember, cookies[:remember_token])
 				log_in user
 				@current_user = user
 			end

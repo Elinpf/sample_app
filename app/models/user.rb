@@ -1,7 +1,8 @@
 class User < ApplicationRecord
-	attr_accessor :remember_token
+	attr_accessor :remember_token, :activation_token
 	# 在保存之前做的事
-	before_save { self.email = email.downcase }
+	before_save :downcase_email
+	before_create :create_activation_digest
 
 	# name， 不能为空， 最大长度为50
 	validates :name, presence: true, length: { maximum: 50 }
@@ -43,10 +44,38 @@ class User < ApplicationRecord
 	end
 
 	# 验证是否为合法cookies
-	def authenticated?(remember_token)
+	# 同时验证　remember 和 activation
+	def authenticated?(attribute, token)
 		# 这里的remeber_digest 其实是 self.remember_digest
 		# User 类在db:migrate后就会将其默认附加到 attr_accessor :remember_digest
-		return false if remember_digest.nil?
-		BCrypt::Password.new(remember_digest) == remember_token
+		digest = self.send("#{attribute}_digest")
+		return false if digest.nil?
+		# 两个值进行比较
+		BCrypt::Password.new(digest).is_password?(token)
+	end
+
+	# 激活账户
+	# 这里是没有使用user.update_attribute
+	# 是因为本身就是user的实例
+	def activate
+		update_attribute(:activated, true)
+		update_attribute(:activated_at, Time.zone.now)
+	end
+
+	# 发送激活邮件
+	def send_activation_email
+		UserMailer.account_activation(self).deliver_now
+	end
+
+private
+	
+	def downcase_email
+		self.email = email.downcase
+	end
+
+	# 在创建用户之前向建一个digest用于验证
+	def create_activation_digest
+		self.activation_token = User.new_token
+		self.activation_digest = User.digest(activation_token)
 	end
 end

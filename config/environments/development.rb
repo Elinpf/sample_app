@@ -26,6 +26,9 @@ Rails.application.configure do
     config.cache_store = :null_store
   end
 
+	# NOTE 在这里加入 action_mail.default_url_options
+	config.action_mailer.default_url_options = { host: 'localhost:3000' }
+
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
 
