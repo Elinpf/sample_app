@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-	attr_accessor :remember_token, :activation_token
+	attr_accessor :remember_token, :activation_token, :reset_token
 	# 在保存之前做的事
 	before_save :downcase_email
 	before_create :create_activation_digest
@@ -65,6 +65,23 @@ class User < ApplicationRecord
 	# 发送激活邮件
 	def send_activation_email
 		UserMailer.account_activation(self).deliver_now
+	end
+
+	# 设置password_reset_digest
+	def create_reset_digest
+		self.reset_token = User.new_token
+		update_attribute(:reset_digest, User.digest(reset_token))
+		update_attribute(:reset_sent_at, Time.zone.now)
+	end
+
+	# 发送Email
+	def send_password_reset_email
+		UserMailer.password_reset(self).deliver_now
+	end
+
+	# 设置超时时间
+	def password_reset_expired?
+		self.reset_sent_at < 2.hours.ago
 	end
 
 private
