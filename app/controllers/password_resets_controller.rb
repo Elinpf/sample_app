@@ -41,7 +41,7 @@ private
 
 	# 取值
 	def user_params
-		params.require(:user).permit(:password, :password_comfirmation)
+ 		params.require(:user).permit(:password, :password_confirmation)
 	end
 	
 	def get_user
