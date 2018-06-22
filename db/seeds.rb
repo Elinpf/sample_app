@@ -30,3 +30,10 @@ User.create!(name: "Elin",
 		activated: true,
 		activated_at: Time.zone.now)
 end
+
+# 调整数据库的顺序
+users = User.order(:created_at)
+50.times do
+	content = Faker::Lorem.sentence(5)
+	users.each { |user| user.microposts.create!(content: content) }
+end

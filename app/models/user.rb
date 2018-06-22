@@ -1,5 +1,8 @@
 class User < ApplicationRecord
 	attr_accessor :remember_token, :activation_token, :reset_token
+	# 与 Microposts 关联, 注意是复数
+	# 与 destroy 联动, 删除了user同时删除 microposts
+	has_many :microposts, dependent: :destroy
 	# 在保存之前做的事
 	before_save :downcase_email
 	before_create :create_activation_digest

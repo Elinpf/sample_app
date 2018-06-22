@@ -11,6 +11,8 @@ class UsersController < ApplicationController
 
 	def show
 		@user = User.find(params[:id])
+		# 从Get中获取page参数,分组发送给@microposts
+		@microposts = @user.microposts.paginate(page: params[:page])
 	end
 
   def new
