@@ -1,0 +1,7 @@
+<% if @feed_items.any? %>
+	<ol class="microposts">
+		<% # 会自动去找@feed_items.class Micropost的类, _micropost.html.erb %>
+		<%= render @feed_items %>
+	</ol>
+	<%= will_paginate @feed_items %>
+<% end %>

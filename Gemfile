@@ -17,6 +17,9 @@ gem 'faker'
 # 分页
 gem 'will_paginate'
 gem 'bootstrap-will_paginate'
+# 上传图片
+gem 'carrierwave'
+gem 'mini_magick'
 # fquery
 gem 'jquery-rails'
 # Use sqlite3 as the database for Active Record

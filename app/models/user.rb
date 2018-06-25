@@ -87,6 +87,11 @@ class User < ApplicationRecord
 		self.reset_sent_at < 2.hours.ago
 	end
 
+	def feed
+		# 这里用的是SQL的语句
+		Micropost.where("user_id = ?", id)
+	end
+
 private
 	
 	def downcase_email

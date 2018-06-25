@@ -64,14 +64,6 @@ private
 	
 	# 提前过滤
 
-	# 确认是在登录状态中
-	def logged_in_user
-		unless logged_in?
-			store_location
-			flash[:danger] = "Please log in."
-			redirect_to login_url
-		end
-	end
 
 	def correct_user
 		@user = User.find(params[:id])
