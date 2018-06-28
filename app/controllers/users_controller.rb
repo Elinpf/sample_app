@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
 	# 前提动作，防止未登录的用户操作
-	before_action :logged_in_user, only: [:index, :edit, :update, :destroy]
+	before_action :logged_in_user, only: [:index, :edit, :update, :destroy,
+			:following, :followers]
 	before_action :correct_user, only: [:edit, :update]
 	before_action :admin_user, only: :destroy
 
@@ -54,6 +55,21 @@ class UsersController < ApplicationController
 		redirect_to users_url
 	end
 
+	# 渲染following页面
+	def following
+		@title = "Following"
+		@user = User.find(params[:id])
+		@users = @user.following.paginate(page: params[:page])
+		render 'show_follow'
+	end
+
+	# 渲染followers页面
+	def followers
+		@title = "Followers"
+		@user = User.find(params[:id])
+		@users = @user.followers.paginate(page: params[:page])
+		render 'show_follow'
+	end
 
 private
 	# 安全的获取方式

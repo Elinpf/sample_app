@@ -1,8 +1,24 @@
 class User < ApplicationRecord
 	attr_accessor :remember_token, :activation_token, :reset_token
 	# 与 Microposts 关联, 注意是复数
+	# :microposts 是方法名, 他的class,Rails 自动识别成为Micropost
 	# 与 destroy 联动, 删除了user同时删除 microposts
 	has_many :microposts, dependent: :destroy
+	# 使用的:active_relationship是方法名, 但是实际的class是Relationship
+	#  外键 "follower_id", User表中follower_id, 指的就是relationship_id
+	#			Rails默认使用的是<class.downcase>_id, 
+	#			Rails 是不会自己创建外键字段, 需要在迁移中手动创建
+	has_many :active_relationships, class_name: "Relationship",	
+							foreign_key: "follower_id",
+							dependent: :destroy
+	# through: 多对多模型
+	has_many :following, through: :active_relationships, source: :followed
+
+	# passive_relationships
+  has_many :passive_relationships, class_name:  "Relationship",
+                                   foreign_key: "followed_id",
+                                   dependent:   :destroy
+  has_many :followers, through: :passive_relationships, source: :follower
 	# 在保存之前做的事
 	before_save :downcase_email
 	before_create :create_activation_digest
@@ -90,6 +106,32 @@ class User < ApplicationRecord
 	def feed
 		# 这里用的是SQL的语句
 		Micropost.where("user_id = ?", id)
+	end
+
+	# 加入关注的用户
+	def follow(other_user)
+		following << other_user
+	end
+
+	# 删除关注的用户
+	def unfollow(other_user)
+		following.delete(other_user)
+	end
+
+	# 返回是否存在关注的用户
+	def following?(other_user)
+		following.include?(other_user)
+	end
+
+	# 返回一个User的状态feed
+	# following_ids 是自带的命令
+	# 使用了内嵌式的SQL语句代码
+	def feed
+		#Micropost.where("user_id IN (?) OR user_id = ?", following_ids, id)
+		following_ids = "SELECT followed_id FROM relationships " + 
+					"WHERE follower_id = :user_id"
+		Micropost.where("user_id IN (#{following_ids}) OR user_id = :user_id",
+					user_id: id)
 	end
 
 private

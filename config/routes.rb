@@ -20,8 +20,16 @@ Rails.application.routes.draw do
 	get '/login', to: 'sessions#new'
 	post '/login', to: 'sessions#create'
 	delete 'logout', to: 'sessions#destroy'
-
-	resources :users
+=begin
+	 following_user GET    /users/:id/following(.:format)          users#following
+	 followers_user GET    /users/:id/followers(.:format)          users#followers
+=end
+	resources :users do
+		# 如果是 collection 就不会有/:id/
+		member do
+			get :following, :followers
+		end
+	end
 
 	# 创建只有edit_account_activation 的路由
 	resources :account_activations, only: [:edit]
@@ -29,4 +37,5 @@ Rails.application.routes.draw do
 	resources :password_resets, only: [:new, :create, :edit, :update]
 
 	resources :microposts, only: [:create, :destroy]
+	resources :relationships, only: [:create, :destroy]
 end
